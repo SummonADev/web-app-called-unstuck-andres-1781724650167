@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { User, Match, Prediction, Comment } from '@/types';
 import * as storage from '@/data/storage';
+import { calculatePoints } from '@/utils/scoring';
 
 interface AppContextType {
   currentUser: User | null;
@@ -98,13 +99,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const rescoreAll = useCallback(() => {
     const allPreds = storage.getPredictions();
     const allMatches = storage.getMatches();
-    const { calculatePoints: calc } = require('@/utils/scoring');
     const updated = allPreds.map(p => {
       const m = allMatches.find(mm => mm.id === p.matchId);
       if (!m || m.homeScore === null || m.awayScore === null) {
         return { ...p, points: null };
       }
-      return { ...p, points: calc(p, m) };
+      return { ...p, points: calculatePoints(p, m) };
     });
     storage.savePredictions(updated);
     refreshData();

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { getTeamFlag } from '@/data/teams';
 import { calculatePoints } from '@/utils/scoring';
+import { getPredictions, savePredictions } from '@/data/storage';
 import EmptyState from '@/components/EmptyState';
 import StageFilter from '@/components/StageFilter';
 
@@ -28,10 +29,8 @@ export default function AdminPage() {
     updateMatch(updated);
 
     // Rescore predictions for this match
-    const matchPreds = predictions.filter(p => p.matchId === matchId);
-    const { savePredictions, getPredictions } = require('@/data/storage');
     const allPreds = getPredictions();
-    const newPreds = allPreds.map((p: typeof predictions[0]) => {
+    const newPreds = allPreds.map((p) => {
       if (p.matchId !== matchId) return p;
       return { ...p, points: calculatePoints(p, updated) };
     });
